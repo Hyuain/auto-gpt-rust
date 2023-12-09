@@ -2,10 +2,10 @@ use std::env;
 use dotenv::dotenv;
 use reqwest::Client;
 use reqwest::header::{HeaderMap, HeaderValue};
-use crate::models::general::llm::{ChatCompletion, Message};
+use crate::models::general::llm::{APIResponse, ChatCompletion, Message};
 
 // Call LLM
-pub async fn call_gpt(messages: Vec<Message>) {
+pub async fn call_gpt(messages: Vec<Message>) -> Result<String, Box<dyn std::error::Error + Send>> {
     dotenv().ok();
 
     // Extract API Key and Host
@@ -18,13 +18,17 @@ pub async fn call_gpt(messages: Vec<Message>) {
     // Create headers
     let mut headers = HeaderMap::new();
 
-    headers.insert("authorization", HeaderValue::from_str(&format!("Bearer {}", api_key)).unwrap());
+    headers.insert(
+        "authorization",
+        HeaderValue::from_str(&format!("Bearer {}", api_key))
+            .map_err(|e| -> Box<dyn std::error::Error + Send> { Box::new(e) })?
+    );
 
     // Create client
     let client = Client::builder()
         .default_headers(headers)
         .build()
-        .unwrap();
+        .map_err(|e| -> Box<dyn std::error::Error + Send> { Box::new(e) })?;
 
     // Create chat completion
     let chat_completion = ChatCompletion {
@@ -34,14 +38,28 @@ pub async fn call_gpt(messages: Vec<Message>) {
     };
 
     // Troubleshooting
-    let res_raw = client
+    // let res_raw = client
+    //     .post(url)
+    //     .json(&chat_completion)
+    //     .send()
+    //     .await
+    //     .unwrap();
+    //
+    // dbg!(res_raw.text().await.unwrap());
+
+    // Extract API Response
+    let res: APIResponse = client
         .post(url)
         .json(&chat_completion)
         .send()
         .await
-        .unwrap();
+        .map_err(|e| -> Box<dyn std::error::Error + Send> { Box::new(e) })?
+        .json()
+        .await
+        .map_err(|e| -> Box<dyn std::error::Error + Send> { Box::new(e) })?;
 
-    dbg!(res_raw.text().await.unwrap());
+    // Send Response
+    Ok(res.choices[0].message.content.clone())
 }
 
 #[cfg(test)]
@@ -57,6 +75,14 @@ mod tests {
 
         let messages = vec![message];
 
-        call_gpt(messages).await;
+
+        let res = call_gpt(messages).await;
+
+        if let Ok(res_str) = res {
+            dbg!(res_str);
+            assert!(true)
+        } else {
+            assert!(false)
+        }
     }
 }
