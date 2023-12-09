@@ -6,7 +6,7 @@ pub struct Message {
     pub content: String
 }
 
-// #[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone)]
 pub struct ChatCompletion {
     pub model: String,
     pub messages: Vec<Message>,

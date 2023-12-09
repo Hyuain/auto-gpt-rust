@@ -1,5 +1,4 @@
 use std::env;
-use std::fmt::format;
 use dotenv::dotenv;
 use reqwest::Client;
 use reqwest::header::{HeaderMap, HeaderValue};
@@ -43,4 +42,21 @@ pub async fn call_gpt(messages: Vec<Message>) {
         .unwrap();
 
     dbg!(res_raw.text().await.unwrap());
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn tests_call_to_openai() {
+        let message = Message {
+            role: "user".to_string(),
+            content: "Hi there, this is a test, Give me a short response.".to_string()
+        };
+
+        let messages = vec![message];
+
+        call_gpt(messages).await;
+    }
 }
