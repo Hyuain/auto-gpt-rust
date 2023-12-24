@@ -1,8 +1,8 @@
-use std::env;
-use dotenv::dotenv;
-use reqwest::Client;
-use reqwest::header::{HeaderMap, HeaderValue};
 use crate::models::general::llm::{APIResponse, ChatCompletion, Message};
+use dotenv::dotenv;
+use reqwest::header::{HeaderMap, HeaderValue};
+use reqwest::Client;
+use std::env;
 
 // Call LLM
 pub async fn call_gpt(messages: Vec<Message>) -> Result<String, Box<dyn std::error::Error + Send>> {
@@ -21,7 +21,7 @@ pub async fn call_gpt(messages: Vec<Message>) -> Result<String, Box<dyn std::err
     headers.insert(
         "authorization",
         HeaderValue::from_str(&format!("Bearer {}", api_key))
-            .map_err(|e| -> Box<dyn std::error::Error + Send> { Box::new(e) })?
+            .map_err(|e| -> Box<dyn std::error::Error + Send> { Box::new(e) })?,
     );
 
     // Create client
@@ -34,7 +34,7 @@ pub async fn call_gpt(messages: Vec<Message>) -> Result<String, Box<dyn std::err
     let chat_completion = ChatCompletion {
         model: "gpt-3.5-turbo".to_string(),
         messages,
-        temperature: 0.1
+        temperature: 0.1,
     };
 
     // Troubleshooting
@@ -70,11 +70,10 @@ mod tests {
     async fn tests_call_to_openai() {
         let message = Message {
             role: "user".to_string(),
-            content: "Hi there, this is a test, Give me a short response.".to_string()
+            content: "Hi there, this is a test, Give me a short response.".to_string(),
         };
 
         let messages = vec![message];
-
 
         let res = call_gpt(messages).await;
 

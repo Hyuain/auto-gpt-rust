@@ -1,7 +1,7 @@
+use crossterm::style::{Color, ResetColor, SetForegroundColor};
+use crossterm::ExecutableCommand;
 use std::io::{stdin, stdout};
 use std::os::macos::raw::stat;
-use crossterm::ExecutableCommand;
-use crossterm::style::{Color, ResetColor, SetForegroundColor};
 
 // Get user request
 pub fn get_user_response(question: &str) -> String {
@@ -29,7 +29,7 @@ pub fn get_user_response(question: &str) -> String {
 pub enum PrintCommand {
     AICall,
     UnitTest,
-    Issue
+    Issue,
 }
 
 impl PrintCommand {
@@ -67,5 +67,4 @@ mod tests {
         PrintCommand::AICall
             .print_agent_message("Managing Agent", "Testing testing, processing something");
     }
-
 }
