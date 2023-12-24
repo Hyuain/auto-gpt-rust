@@ -12,3 +12,4 @@ reqwest = { version = "0.11.22", features = ["json"] }
 serde = { version = "1.0.193", features = ["derive"] }
 tokio = { version = "1.35.0", features = ["full"] }
 ai_function = { path = "ai_function" }
+serde_json = "1.0.108"
