@@ -1,4 +1,6 @@
+use crate::models::agent_basic::basic_agent::BasicAgent;
 use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub struct ProjectScope {
@@ -23,4 +25,15 @@ pub struct FactSheet {
     pub external_urls: Option<Vec<String>>,
     pub backend_code: Option<String>,
     pub api_endpoint_schema: Option<Vec<RouteObject>>,
+}
+
+pub trait SpecialFunctions: Debug {
+    // Used to that manager can get attributes from agents
+    fn get_attributes_from_agent(&self) -> &BasicAgent;
+
+    // This function will allow agents to execute their logic
+    async fn execute(
+        &mut self,
+        fact_sheet: &mut FactSheet,
+    ) -> Result<(), Box<dyn std::error::Error>>;
 }
